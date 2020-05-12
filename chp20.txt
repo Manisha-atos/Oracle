@@ -1,0 +1,38 @@
+create table mgr_his(empno number(6),mgr number(6),sal number(8,2));
+
+create table sal_his(empno number(6),hiredate date,sal number(8,2));
+
+INSERT  ALL
+INTO sal_his VALUES(EMPID,HIREDATE,SAL)
+INTO mgr_his VALUES(EMPID,MGR,SAL)
+SELECT empno EMPID, hiredate HIREDATE, sal SAL, mgr MGR 
+FROM  emp  WHERE empno >7600;
+
+select * from mgr_his
+
+INSERT ALL
+ WHEN SAL > 3000 THEN    INTO sal_his VALUES(EMPID,HIREDATE,SAL)
+ WHEN MGR >7800   THEN   INTO mgr_his VALUES(EMPID,MGR,SAL)  
+    SELECT empno EMPID,hiredate HIREDATE,  
+           sal SAL, mgr MGR 
+    FROM   emp   WHERE  empno >7600;
+
+create table spe_sal(deptno number ,sumsal number,maxhire date)
+create table hir_his_82 
+(deptno number ,maxhir date)
+
+create table hir_his_81 
+(deptno number ,maxhir date)
+create table hir_his 
+(deptno number ,hir date)
+INSERT FIRST  WHEN SAL  > 25000          THEN   INTO spe_sal VALUES(DEPTID, SAL)
+ WHEN HIREDATE like ('%81%') THEN
+ INTO hir_his_81 VALUES(DEPTID,HIREDATE)
+  WHEN HIREDATE like ('%82%') THEN
+  INTO hir_his_82 VALUES(DEPTID, HIREDATE)
+  ELSE  INTO hir_his VALUES(DEPTID, HIREDATE)
+  SELECT deptno DEPTID, SUM(sal) SAL,         MAX(hiredate) HIREDATE  FROM   emp
+  GROUP BY deptno;
+
+
+

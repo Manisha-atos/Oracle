@@ -1,0 +1,85 @@
+select sum(sal),min(sal),max(sal),avg(sal) from emp;
+---------
+select count(sal),count(comm),count(*) from emp;
+--------------
+select count(job),count(distinct job) from emp;
+------------
+select count(comm),count(nvl(comm,0)) from emp;
+------------------
+select deptno,max(sal),min(sal) from emp
+group by deptno;
+-----------------
+select deptno,job,max(sal),min(sal) from emp
+group by deptno,job;
+-------------------
+select deptno,max(sal) from emp
+group by deptno
+having max(sal)>3000;
+---------------------
+select job,deptno,max(sal) from emp group by deptno,job;
+-----------
+select deptno,max(sal) from emp
+where job='MANAGER'
+group by deptno
+having max(sal)>2500;
+------------------------------
+select ename,sal,empno from emp
+where 
+sal>(select sal from emp where ename='SMITH')
+and sal<3000;
+--------------
+select ename,sal,empno from emp
+where 
+sal >(select sal from emp where ename='SMITH')
+and 
+sal<(select sal from emp where ename='BLAKE')
+----------------
+select deptno,sal
+from emp
+where sal>(select min(sal) from emp);
+----------------------
+select deptno,max(sal)
+from emp
+group by deptno
+having max(sal)>=
+(select max(sal) from emp where deptno=20);
+-------------
+select ename,sal from emp
+where sal=
+(select sal from emp where deptno=20);
+(select sal from emp where deptno=20) 
+ * 
+ERROR at line 3: 
+ORA-01427: single-row subquery returns more than one row 
+-------------
+select ename,sal from emp
+where sal=
+(select sal from emp where ename='smith');
+no rows selected 
+
+---------------
+select sal from emp where deptno=10;
+
+select ename,sal from emp
+where sal<any
+(select sal from emp where deptno=10);
+
+select ename,sal from emp
+where sal>any
+(select sal from emp where deptno=10);
+---------------
+select sal from emp where deptno=10;
+
+select ename,sal from emp
+where sal<all
+(select sal from emp where deptno=10);
+
+select ename,sal from emp
+where sal>all
+(select sal from emp where deptno=10);
+-------------
+select sal from emp where deptno=10;
+
+select ename,sal from emp
+where sal in
+(select sal from emp where deptno=10);

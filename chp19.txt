@@ -1,0 +1,23 @@
+SELECT empno, ename, job, mgr
+FROM   emp
+START  WITH  empno = 7369
+CONNECT BY PRIOR mgr = empno ;
+
+SELECT  ename||' reports to '|| 
+PRIOR   ename "Walk Top Down"
+FROM    emp
+START   WITH ename = 'KING'
+CONNECT BY PRIOR empno = mgr ;
+
+SELECT LPAD(ename, LENGTH(ename)+(LEVEL*2)-2,'_') 
+AS "org_chart"
+FROM   emp 
+START WITH ename='KING' 
+CONNECT BY PRIOR empno=mgr 
+
+SELECT LPAD(ename, LENGTH(ename)+(LEVEL*2)-2,'_') 
+AS "org_chart"
+FROM   emp 
+START WITH mgr is null 
+CONNECT BY PRIOR empno=mgr 
+and ename!='SCOTT'

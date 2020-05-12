@@ -1,0 +1,115 @@
+Pair
+ SELECT empno, mgr, deptno
+ FROM emp
+ WHERE  (mgr, deptno) IN
+ (SELECT mgr, deptno
+ FROM   emp
+ WHERE  empno IN (7521,7566))
+ AND empno NOT IN (7521,7566)
+/
+Non pair
+SELECT  empno, mgr, deptno
+FROM    emp
+WHERE   mgr IN 
+(SELECT  mgr
+FROM    emp
+WHERE   empno IN (7521,7566))
+AND     deptno IN 
+(SELECT  deptno
+FROM    emp
+WHERE   empno IN (7521,7566))
+AND empno NOT IN(7521,7566)
+/
+Subquery in from clause
+select a.ename,a.sal,a.deptno,
+b.maxsal from emp a ,
+(select deptno,max(sal) maxsal from emp group by deptno) b
+where a.deptno=b.deptno;
+
+scalar subquery
+SELECT empno,ename,
+(CASE
+WHEN job ='MANAGER'
+THEN 'no inc' ELSE 'inc' END) growth
+FROM   emp
+/
+select empno,ename,dname from emp e,dept d where e.deptno=d.deptno;
+
+SELECT   empno,ename
+FROM   emp e
+ORDER BY (SELECT dname
+FROM dept d
+WHERE e.deptno = d.deptno)
+/
+select * from emp where deptno=40;
+
+select deptno,avg(sal)  from emp group by deptno;
+
+SELECT ename, sal, deptno
+FROM   emp outer
+WHERE  sal >
+(SELECT AVG(sal)
+FROM   emp
+WHERE  deptno =
+outer.deptno)
+/
+
+select empno,ename,mgr, job, deptno
+from emp where empno in(select mgr from emp where mgr is not null);
+
+SELECT empno,ename,mgr, job, deptno
+FROM   emp outer
+WHERE  EXISTS ( SELECT 'X'
+FROM   emp
+WHERE  mgr = 
+outer.empno)
+/
+
+SELECT empno,ename,mgr, job, deptno
+FROM   emp outer
+WHERE  NOT EXISTS ( SELECT 'X'
+FROM   emp
+WHERE  mgr = 
+outer.empno)
+/
+alter table emptest
+add (dname varchar2(20))
+
+UPDATE emptest e
+SET   e.dname =
+(SELECT dname
+FROM   dept d
+WHERE  e.deptno = d.deptno)
+/
+create table mytab
+as
+select * from emp
+where deptno=10
+
+DELETE FROM emptest E
+WHERE empno =
+(SELECT empno
+FROM   mytab
+WHERE  empno = E.empno)
+/
+select dname,avg(sal),sum(sal) from emp e,dept d
+where e.deptno=d.deptno
+group by dname
+having sum(sal)>avg(sal); 
+WITH 
+dept_costs AS (
+SELECT  d.dname, SUM(e.sal) AS dept_total
+FROM  emp e, dept d
+WHERE   e.deptno = d.deptno
+GROUP BY d.dname),
+avg_cost AS (
+SELECT SUM(dept_total)/COUNT(*) AS dept_avg
+FROM  dept_costs)
+SELECT * 
+FROM   dept_costs
+WHERE  dept_total >
+(SELECT dept_avg 
+FROM avg_cost)
+ORDER BY dname;
+/
+
