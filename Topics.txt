@@ -1,0 +1,810 @@
+Attendance:
+4 days men 
+SQL /PLSQL workshop
+select 
+select * from <>
+where 
+group by 
+having
+order  by 
+
+single row /  multiple row function 
+Joins
+Subquery
+Set operation 
+
+
+DML:
+
+merge
+
+DDL:
+constraints 
+
+Object :
+table
+view
+seque
+syn
+index
+func
+pro
+
+grant revoke
+
+
+commit rollback
+
+
+Day 1:
+
+case , decode ,pivote 
+
+
+select empno,ename,sal,job,
+case job when 'MANAGER' then sal+1000
+	 when 'ANALYST' then sal+2000
+	 else sal+500 end
+as "Revised sal" from emp;
+
+
+
+select empno,ename,sal,job,
+decode (job ,'MANAGER', sal+1000,
+	 'ANALYST' , sal+2000,
+	  sal+500 )
+as "Revised sal" from emp;
+
+
+Subqueries
+
+Non co-related 		co-related 
+
+
+UPDATE test t
+ SET dname = (SELECT dname
+               FROM dept d
+               WHERE t.deptno =
+                    d.deptno);
+
+
+DELETE FROM test t
+ WHERE comm =
+               (SELECT comm
+                FROM test1 t1
+                WHERE t.empno = t1.empno);
+
+where job=()
+and 
+sal=()
+
+where (job,sal)
+
+set operations:
+
+
+union
+union all
+intersect 
+minus
+
+SQL> drop table test;
+
+Table dropped.
+
+
+https://forms.office.com/Pages/ResponsePage.aspx?id=xg9EM8e3LEG7cw5wsBmNWgRony0_qidBtwRhpKBNV5RUN0Y5OElZVkJZRjQxSlFJMlE3RjBUWFhYSi4u.
+
+https://forms.office.com/Pages/ShareFormPage.aspx?id=xg9EM8e3LEG7cw5wsBmNWuKW4XMUCPpKnmzEgA9AsJlURFc5U0JJQlpVSUhNM05PNUc5MkRBOTIwMC4u&sharetoken=OUgijVfJUpktilMkyvfO
+
+SQL> create table test as(select * from emp where deptno=10);
+
+Table created.
+
+SQL> select * from emp
+  2  union
+  3  select * from test;
+
+     E
+SQL> select * from emp
+  2  union all
+  3  select * from test;
+
+
+SQL> select * from emp
+  2  intersect
+  3  select * from test;
+
+
+SQL> select * from emp
+  2  minus
+  3  select * from test;
+
+
+SQL> select empno,deptno from test
+  2  union
+  3  select empno,ename from emp;
+select empno,deptno from test
+             *
+ERROR at line 1:
+ORA-01790: expression must have same datatype as corresponding expression
+
+
+SQL> select empno,deptno from test
+  2  union
+  3  select empno,job from emp;
+select empno,deptno from test
+             *
+ERROR at line 1:
+ORA-01790: expression must have same datatype as corresponding expression
+
+
+SQL> select empno,ename from test
+  2  union
+  3  select empno,job from emp;
+
+
+SQL> select empno,to_char(null),hiredate from test
+  2  union
+  3  select empno,job,to_date(null) from emp;
+
+Day 2:
+Joins 
+inner join outre join 
+Contraints 
+
+
+Join --- 
+condition 
+inner join 		outer join 
+product cross , cart
+
+inner join 
+=   --- equi join
+<> = ---- non equi join 
+self join 
+
+
+outer 
+--left 
+--right 
+--full outer join  
+
+SQL> select empno,ename,emp.deptno,dname
+  2  from emp ,dept;
+
+SQL> select empno,ename,e.deptno,dname
+  2  from emp e,dept d
+  3  where e.deptno=d.deptno
+  4  order by deptno;
+
+SQL> select empno,ename,sal,grade
+  2  from emp ,salgrade s
+  3  where sal between losal and hisal
+  4  order by grade;
+
+SQL> select e.ename || ' works for Manager '|| m.ename
+  2  from emp e,emp m
+  3  where e.mgr=m.empno;
+
+SQL> select m.ename || ' is a Manager of '||e.ename
+  2  from emp e,emp m
+  3  where m.empno=e.mgr;
+
+
+
+SQL> select empno,ename,e.deptno ,dname
+  2  from emp e,dept d
+  3  where e.deptno(+)=d.deptno;
+
+SQL> select empno,ename,e.deptno ,dname
+   from emp e,dept d
+   where e.deptno=d.deptno(+);
+
+
+SQL> select empno,ename,e.deptno ,dname
+  2  from emp e cross join dept;
+
+
+Natural ==equality common column , name and same Datatype.
+SQL> select empno,ename,e.deptno ,dname
+  2  from emp e natural join dept;
+select empno,ename,e.deptno ,dname
+                   *
+ERROR at line 1:
+ORA-25155: column used in NATURAL join cannot have qualifier
+
+
+SQL> select empno,ename,deptno ,dname
+  2  from emp e natural join dept;
+
+SQL> select empno,ename,deptno ,dname
+  2  from emp join dept
+  3  using (deptno);
+
+SQL> select empno,ename,sal,grade
+  2  from emp join salgrade s
+  3  on sal between losal and hisal;
+
+SQL> select empno,ename,dname,deptno,job
+  2  from emp join dept
+  3  on deptno=dno;
+
+SQL> select empno,ename,dname,deptno,job
+  2  from emp join dept
+  3  on deptno=dno and job='MANAGER';
+
+
+SQL> select e.ename ||' works for manager '||m.ename
+  2  from emp e join emp m
+  3  on e.mgr=m.empno;
+
+
+SQL> select empno,ename,deptno,dno,dname
+  2  from emp left outer join dept
+  3  on deptno=dno;
+
+SQL> select empno,ename,deptno,dno,dname
+    from emp right outer join dept
+  on deptno=dno;
+
+select empno,ename,deptno,dno,dname
+from emp full outer join dept
+on deptno=dno;
+
+
+DDL
+create, alter ,drop,truncate 
+contraint 
+
+uk,pk 
+composite key 
+uk+NN---PK
+forign key 
+Not null 
+check key 
+create , alter 
+column level
+table level
+
+
+
+create table test (id number primary key,ename varchar2(20));
+
+select  CONSTRAINT_NAME, CONSTRAINT_TYPE from user_constraints where table_name='TEST';
+select * from user_cons_columns where table_name='TEST';
+
+
+SQL> create table test(fn varchar2(20),ln varchar2(20),adr varchar2(20),
+  2  constraint pk_fl primary key (fn,ln));
+
+
+create table test (id number,name varchar2(20));
+alter table test add constraint pk_id primary key(id);
+alter table test drop constraint pk_id;
+alter table test modify name varchar2(20) not null;
+alter table test add cid varchar2(20) not null constraint uk unique;
+
+
+create table child(id number primary key,name varchar2(20),
+dno number references parent(dno)
+on delete cascade);
+
+SQL> insert into child values (3,'b',100);
+insert into child values (3,'b',100)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (SYS.SYS_C004016) violated - parent key not
+found
+
+SQL> delete from parent where dno=10;
+delete from parent where dno=10
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (SYS.SYS_C004016) violated - child record found
+
+
+SQL> create table child(id number primary key,name varchar2(20),
+  2  dno number references parent(dno)
+  3  on delete cascade);
+
+
+create table child(id number primary key,name varchar2(20),
+dno number references parent(dno)on delete set null);
+
+SQL> create table child(id number primary key,name varchar2(20),
+  2  dno number references parent(dno)on delete set null);
+
+delete from emp where empno=(select * from emp order by empno limit 1)
+
+dept 
+emp - 2  set deptno=null
+
+Day 3:
+Transaction 
+save ---
+undo changes
+commit
+rollback
+
+ create user manisha identified by lion
+SQL> grant create session ,unlimited tablespace to manisha;
+
+Grant succeeded.
+
+SQL> grant create table to manisha;
+
+Grant succeeded.
+
+SQL> grant select , update on emp to manisha;
+
+Grant succeeded.
+
+create table test as (select * from emp where 1=2);
+insert into test (select * from emp where deptno=10);
+create table test as (select * from emp where deptno=20);
+SQL> create table test (eno,name,dno)
+  2  as (select empno,ename,deptno from emp );
+truncate and delete.
+
+oracle object
+view 
+create view v1
+  2  as (select empno,ename,sal,deptno,job from emp where deptno=10);
+ 
+SQL> create view v2
+  2  as (select * from emp);
+
+SQL> update v2 set sal=45000 where ename='Samir';
+create or replace view v2
+  2  as (select empno,ename,deptno,dname from emp natural join dept);
+
+SQL> update v2 set dname='IT' where deptno=20;
+update v2 set dname='IT' where deptno=20
+              *
+ERROR at line 1:
+ORA-01779: cannot modify a column which maps to a non key-preserved table
+SQL> select view_name,text,view_type from user_views where view_name='V2';
+
+SQL> drop view v2;
+synonym
+SQL> create synonym e1 for employee2023;
+select * from e1;
+
+SQL> grant select on employee2023 to manisha;
+
+Grant succeeded.
+
+SQL> create public synonym e1 for employee2023;
+drop synonym e1;
+drop public synonym e1;
+ 
+sequence--- auto
+SQL> create sequence s1
+  2  minvalue 5
+  3  maxvalue 20
+  4  increment by 3
+  5  cycle
+  6  cache 3;
+SQL> select * from user_sequences where sequence_name='S1';
+index
+SQL> create index name_id on test1(name);
+SQL> select index_type,table_name,index_name from user_indexes where table_name='TEST1';
+alter sequence s1
+nocycle;
+merge
+CTE
+
+MERGE into  master  m
+USING trans   t  
+ON (m.empno=t.empno)  
+    WHEN MATCHED then       
+update set m.sal=t.sal
+   WHEN NOT MATCHED   then
+insert (empno,ename,sal,deptno)
+values (t.empno,t.ename,t.sal,t.deptno)
+;
+
+Day 4:
+
+PL SQL 
+declare
+vari
+curso
+
+begin
+
+
+exception 
+
+end;
+
+ begin
+  2  dbms_output.put_line('hello');
+  3  dbms_output.put_line('welcome to plsql');
+  4  end;
+
+declare
+a number;
+b number;
+c number;
+begin
+a:=&a;
+b:=&b;
+c:=a+b;
+dbms_output.put_line('sum='||c);
+end;
+
+
+declare
+eno number;
+name varchar2(20);
+cmp varchar2(20) default 'ABC ltd.';
+sl number(8,2);
+begin
+eno:=&eno;
+select ename,sal into name,sl from emp where empno=eno;
+dbms_output.put_line(name);
+dbms_output.put_line(sl);
+end;
+
+
+declare
+eno emp.empno%type;
+name emp.ename%type;
+cmp varchar2(20) default 'ABC ltd.';
+sl emp.sal%type;
+begin
+eno:=&eno;
+select ename,sal into name,sl from emp where empno=eno;
+dbms_output.put_line(cmp);
+dbms_output.put_line(name);
+dbms_output.put_line(sl);
+end;
+
+declare
+emp_rec emp%rowtype;
+eno emp.empno%type;
+begin
+eno:=&eno;
+select * into emp_rec from emp where empno=eno;
+dbms_output.put_line(emp_rec.ename);
+dbms_output.put_line(emp_rec.job);
+dbms_output.put_line(emp_rec.deptno);
+dbms_output.put_line(emp_rec.sal);
+end;
+
+
+
+declare 
+i number;
+begin
+i:=6;
+loop
+dbms_output.put_line(i);
+i:=i+1;
+exit when i>5;
+end loop;
+end;
+
+declare 
+i number;
+begin
+i:=6;
+loop
+exit when i>5;
+dbms_output.put_line(i);
+i:=i+1;
+end loop;
+end;
+
+DECLARE 
+   a number(2) := 10; 
+BEGIN 
+   WHILE a < 20 LOOP 
+      dbms_output.put_line('value of a: ' || a); 
+      a := a + 1; 
+   END LOOP; 
+END; 
+
+
+DECLARE 
+   a number(2); 
+BEGIN 
+   FOR a in reverse 10 .. 20   LOOP 
+      dbms_output.put_line('value of a: ' || a); 
+  END LOOP; 
+END; 
+
+
+create or replace procedure pr1(eno number)
+as
+emp_rec emp%rowtype;
+begin
+select * into emp_rec from emp where empno=eno;
+dbms_output.put_line(emp_rec.ename);
+dbms_output.put_line(emp_rec.sal);
+end pr1;
+
+create or replace procedure pr1(eno number,name out varchar,sl out number)
+as
+begin
+select ename,sal into name,sl from emp where empno=eno;
+end pr1;
+
+SQL> declare
+    n varchar2(20);
+    s emp.sal%type;
+    begin
+    pr1(7900,n,s);
+    dbms_output.put_line(n);
+    dbms_output.put_line(s);
+    end;
+
+
+variable n1 varchar;
+variable s1 number;
+exec pr1(7900,:n,:s);
+print :n;
+print s;
+
+declare 
+eno number;
+cursor c1 is select * from emp where empno=&eno;
+e1 emp%rowtype;
+begin
+open c1;
+fetch c1 into e1;
+if c1%found then
+	
+	dbms_output.put_line(e1.ename);
+else
+	dbms_output.put_line('no data found');
+end if;
+end;
+
+
+
+declare 
+eno number;
+e1 emp%rowtype;
+begin
+select * into e1 from emp where empno=7900;
+if sql%found then
+	
+	dbms_output.put_line(e1.ename);
+else
+	dbms_output.put_line('no data found');
+end if;
+end;
+
+
+declare 
+eno number;
+e1 emp%rowtype;
+begin
+select * into e1 from emp;
+while sql%found loop
+	dbms_output.put_line(e1.ename);
+end loop;
+end;
+
+
+
+
+
+
+DECLARE  
+   total_rows number(2); 
+BEGIN 
+   UPDATE emp  
+   SET sal= sal + 500 where deptno=10; 
+   IF sql%notfound THEN 
+      dbms_output.put_line('no employee selected'); 
+   ELSIF sql%found THEN 
+      total_rows := sql%rowcount;
+      dbms_output.put_line( total_rows || ' employee selected '); 
+   END IF;  
+END; 
+
+DECLARE 
+ e1 emp%rowtype;
+   CURSOR c1 is 
+      SELECT * from emp ;
+BEGIN 
+   OPEN c1; 
+   LOOP 
+   FETCH c1 into e1; 
+      EXIT WHEN c1%notfound; 
+      dbms_output.put_line(e1.ename||'  '||e1.sal); 
+   END LOOP; 
+   CLOSE c1; 
+END; 
+
+
+DECLARE 
+ e1 emp%rowtype;
+   CURSOR c1 is 
+      SELECT * from emp where deptno=50;
+BEGIN 
+   OPEN c1; 
+   LOOP 
+   FETCH c1 into e1; 
+      EXIT WHEN c1%notfound; 
+      dbms_output.put_line(e1.ename||'  '||e1.sal); 
+   END LOOP; 
+   CLOSE c1; 
+END; 
+
+
+CURSOR customer_cur is 
+      SELECT id, name, address  
+      FROM customers; 
+   customer_rec customer_cur%rowtype; 
+
+DECLARE 
+   CURSOR c1 is 
+      SELECT empno,ename from emp ;
+e1 c1%rowtype;
+BEGIN 
+   OPEN c1; 
+   LOOP 
+   FETCH c1 into e1; 
+      EXIT WHEN c1%notfound; 
+      dbms_output.put_line(e1.ename||'  '||e1.sal); 
+   END LOOP; 
+   CLOSE c1; 
+END; 
+
+SQL> DECLARE
+  2     CURSOR c1 is
+  3        SELECT empno,ename from emp ;
+  4  e1 c1%rowtype;
+  5  BEGIN
+  6     OPEN c1;
+  7     LOOP
+  8     FETCH c1 into e1;
+  9        EXIT WHEN c1%notfound;
+ 10        dbms_output.put_line(e1.ename||'  '||e1.sal);
+ 11     END LOOP;
+ 12     CLOSE c1;
+ 13  END;
+ 14  /
+      dbms_output.put_line(e1.ename||'  '||e1.sal);
+                                              *
+ERROR at line 10:
+ORA-06550: line 10, column 47:
+PLS-00302: component 'SAL' must be declared
+ORA-06550: line 10, column 7:
+PL/SQL: Statement ignored
+
+
+DECLARE 
+   TYPE salary IS TABLE OF NUMBER INDEX BY VARCHAR2(20); 
+   salary_list salary; 
+   name   VARCHAR2(20); 
+BEGIN 
+   -- adding elements to the table 
+   salary_list('Rajnish') := 62000; 
+   salary_list('Minakshi') := 75000; 
+   salary_list('Martin') := 100000; 
+   salary_list('James') := 78000;  
+   
+   -- printing the table 
+   name := salary_list.FIRST; 
+   WHILE name IS NOT null LOOP 
+      dbms_output.put_line 
+      ('Salary of ' || name || ' is ' || TO_CHAR(salary_list(name))); 
+      name := salary_list.NEXT(name); 
+   END LOOP; 
+END; 
+/
+
+
+DECLARE 
+   CURSOR c1 is select ename from emp;
+   TYPE c_list IS TABLE of emp.ename%type INDEX BY binary_integer; 
+   name_list c_list; 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN reverse c1 LOOP 
+      counter := counter +1; 
+      name_list(counter) := n.ename; 
+      dbms_output.put_line('Employee('||counter||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+
+Netsted Table  and Varray 
+
+
+
+cursor:
+DECLARE 
+   CURSOR c1 is 
+      SELECT * from emp where deptno=20;
+BEGIN 
+ for e1 in c1 loop     
+      dbms_output.put_line(e1.ename||'  '||e1.sal); 
+   END LOOP; 
+  
+END; 
+
+
+DECLARE
+    CURSOR c1 (dno number) is
+       SELECT empno,ename,sal,deptno from emp where deptno=dno;
+ e1 c1%rowtype;
+    BEGIN
+      OPEN c1(10);
+      LOOP
+     FETCH c1 into e1;
+        EXIT WHEN c1%notfound;
+       dbms_output.put_line(e1.ename||'  '||e1.sal||' ' ||e1.deptno);
+     END LOOP;
+     CLOSE c1;
+  END;
+  
+END; 
+
+declare
+e1 emp%rowtype;
+begin
+select * into e1 from emp where empno=&eno;
+dbms_output.put_line(e1.ename);
+exception 
+when no_data_found then
+dbms_output.put_line('Employee doesnt exist');
+when others then
+dbms_output.put_line(sqlerrm);
+end;
+
+
+declare
+e1 emp%rowtype;
+begin
+select * into e1 from emp where deptno=&dno;
+dbms_output.put_line(e1.ename);
+exception 
+when no_data_found then
+dbms_output.put_line('Employee doesnt exist');
+when others then
+dbms_output.put_line(sqlerrm);
+end;
+
+exception handling
+
+DEFINE p_deptno = 10
+DECLARE
+e_emps_remaining EXCEPTION;
+PRAGMA EXCEPTION_INIT 
+(e_emps_remaining, -2292);
+BEGIN
+DELETE FROM dept
+WHERE deptno= &dno;
+COMMIT;
+EXCEPTION
+WHEN e_emps_remaining THEN
+DBMS_OUTPUT.PUT_LINE ('Cannot remove dept ' ||
+TO_CHAR(&dno) || '. Employees exist. ');
+END;
+
+
+DECLARE
+e_invalid_department EXCEPTION;
+BEGIN
+UPDATE emp
+SET sal=sal+1000
+WHERE deptno=&dno;
+--IF SQL%NOTFOUND THEN
+--RAISE e_invalid_department;
+--END IF;
+COMMIT;
+--EXCEPTION
+--WHEN e_invalid_department THEN
+--DBMS_OUTPUT.PUT_LINE('No such department id.');
+END;
+package
+
+
+
+
