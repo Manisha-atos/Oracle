@@ -1,0 +1,57 @@
+select upper(substr('welcome to india',-8)) from dual
+
+sys_context worked for 
+hierarchical qur
+session
+parallel lines
+
+
+column format for local currency
+
+to transfer control to the operand part which of the operator used
+logical
+arithmetic
+branch
+data movement
+
+can u convert one buit in datatype/collection data type into buit in datatype/collection
+casting
+type casting
+cannot 
+
+which of this are not oracle 9i froup fun
+rollup
+variance
+stdev
+sum
+
+which operator not used in outer join
+in and or
+and n or
+
+insert into test (empid,sal ) values(e1001,1000);
+savepoint s1
+update test set sal=sal*10
+rollback to s1
+update test set sal=sal+1000
+
+empno number(4)
+ename varchar2(5)
+insert into emp values(1001,'MICHEAL');
+
+
+
+
+
+10000
+2000
+1110
+1000
+
+private synonym
+when table get deleted then its synonym doenot  get deleted 
+
+
+
+
+

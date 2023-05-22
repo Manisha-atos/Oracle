@@ -1,0 +1,100 @@
+create or replace procedure delete_all_rows
+(tname in varchar2,no_row out number)
+is
+cursor_name INTEGER;
+begin
+cursor_name:=DBMS_SQL.open_cursor;
+dbms_sql.parse(cursor_name,'delete from '||tname,dbms_sql.native);
+no_row:=dbms_sql.execute(cursor_name);
+dbms_sql.close_cursor(cursor_name);
+end;
+------------------------------------
+variable x number;
+execute delete_all_rows('psq',:x);
+print x;
+------------------------------------
+create or replace procedure  del_rows(tname varchar2,no_rows out number)
+is
+begin
+execute immediate 'delete from '|| tname;
+no_rows:=sql%rowcount;
+end;
+--------------------------------------------------
+execute del_rows('psq',:x);
+print x;
+--------------------------------------------------
+create or replace procedure pr1
+is
+begin
+dbms_ddl.analyze_object('TABLE','scott','psq','compute');
+end;
+
+------------------
+create or replace package p1
+is
+procedure add_dept(dname varchar2,dno number);
+end;
+
+create or replace package body p1
+is
+procedure add_dept(name varchar2,dno number)
+is
+begin
+insert into dept (deptno,dname) values(dno,name);
+end add_dept;
+end p1;
+
+variable jobno number;
+begin
+dbms_job.submit(job =>:jobno,
+what=>'p1.add_dept(''eduaction'',50);',
+next_date=>trunc(sysdate+1),
+interval=>'trunc(sysdate+1)'
+);
+commit;
+end;
+
+execute dbms_job.run(1);
+
+select job,log_user,next_date,next_sec,broken,what
+from DBA_JOBS;
+-----------------------------------
+create or replace procedure sal_status
+(p_filedir in varchar2, p_filename in varchar2)
+is
+v_filehandle UTL_FILE.FILE_TYPE;
+cursor emp_info is
+select ename, sal, dept_no
+from emp
+order by dept_no;
+v_newdeptno emp.dept_no%type;
+v_olddeptno emp.dept_no%type:=0;
+v_emprec emp_info%rowtype; 
+begin
+v_filehandle:=utl_file.fopen (p_filedir, p_filename,'w');
+utl_file.putf(v_filehandle,'salary report: generated on%s\n',sysdate);
+utl_file.new_line(v_filehandle);
+for v_emprec in emp_info loop
+v_newdeptno := v_emprec.dept_no;
+if v_newdeptno<> v_olddeptno then
+utl_file.putf(v_filehandle, 'deptno: %s\n',v_emprec.dept_no);
+end if;
+utl_file.putf(v_filehandle,'emp : %s earns: %s\n',v_emprec.ename, v_emprec.sal);
+v_olddeptno := v_newdeptno;
+end loop;
+utl_file.put_line(v_filehandle, '***END OF REPORT***');
+utl_file.fclose(v_filehandle);
+exception 
+--when utl_file.invalid_filehandle then
+--raise _application_error (-20001, 'invalid file.');
+when utl_file.write_error then
+raise_application_error(-20002,'Unable to write to file');
+end sal_status;
+
+execute sal_status('c:\utl_file','sal_staus.txt');
+
+
+
+
+
+

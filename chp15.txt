@@ -1,0 +1,26 @@
+alter table emp add emp_video bfile;
+create or replace directory log_files as '/$home/log_files';
+grant read on directory log_files to public
+update scott.emp set emp_video=bfilename('log_files','king.avi')
+
+CREATE OR REPLACE PROCEDURE load_emp_bfile
+(p_file_loc IN VARCHAR2) IS
+v_file BFILE;
+v_filename VARCHAR2(16);
+CURSOR emp_cursor IS
+SELECT ename FROM scott.emp
+WHERE deptno = 10 FOR UPDATE;
+BEGIN
+FOR emp_record IN emp_cursor LOOP
+v_filename := emp_record.ename || '.bmp';
+v_file := BFILENAME(p_file_loc, v_filename);
+DBMS_LOB.FILEOPEN(v_file);
+UPDATE scott.emp SET emp_video = v_file
+WHERE CURRENT OF emp_cursor;
+DBMS_OUTPUT.PUT_LINE('LOADED FILE: '||v_filename
+|| ' SIZE: ' || DBMS_LOB.GETLENGTH(v_file));
+DBMS_LOB.FILECLOSE(v_file);
+END LOOP;
+END load_emp_bfile;
+/
+

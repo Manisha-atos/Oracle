@@ -1,0 +1,147 @@
+create or replace function get_sal(eid emp.empno%type) return number
+is
+s emp.sal%type;
+begin
+select sal into s from emp where empno=eid;
+return s;
+end get_sal;
+--------------------------------------------
+create or replace function inc(j emp.job%type) return number
+is
+s number(8,2);
+begin
+if j='MANAGER' then
+return 1000;
+end if;
+s:=get_sal(7900);
+update emp set sal=s where empno=7900;
+end inc;
+---------------------------------------------
+create or replace package p1
+is
+procedure raise_sal(eid emp.empno%type);
+function get_sal(eid emp.empno%type) return number;
+end p1;
+-----------------------------------------------
+create or replace package body p1 
+is
+
+procedure raise_sal(eid emp.empno%type)
+is
+begin
+dbms_output.put_line('raise emp sal');
+end raise_sal;
+
+function get_sal(eid emp.empno%type) return number
+is 
+s emp.sal%type;
+begin
+select sal into s from emp where empno=eid;
+return s;
+end get_sal;
+
+end p1;
+--------------------------------------------------
+exec p1.raise_sal(7900);
+------------------------------------------------------------
+create or replace package p2
+is
+a constant number:=1;
+end p2;
+--------------------------------------------------
+
+declare
+x number;
+begin
+x:=p2.a+10;
+dbms_output.put_line(x);
+end;
+
+------------------------------
+create or replace package p1
+is
+procedure raise_sal(eid emp.empno%type);
+end p1;
+------------------------
+create or replace package body p1 
+is
+procedure  get_sal(eid emp.empno%type) ;
+procedure raise_sal(eid emp.empno%type)
+is
+begin
+get_sal(7900);
+dbms_output.put_line('raise emp sal');
+end raise_sal;
+
+procedure  get_sal(eid emp.empno%type) 
+is 
+s emp.sal%type;
+begin
+select sal into s from emp where empno=eid;
+end get_sal;
+
+end p1;
+-------------------------
+create or replace package p1
+is
+s number(8,2);
+procedure raise_sal(eid emp.empno%type);
+end p1;
+----------------------------------------------
+create or replace package body p1 
+is
+procedure raise_sal(eid emp.empno%type)
+is
+begin
+dbms_output.put_line('raise emp sal');
+end raise_sal;
+
+begin
+select sal into p1.s from emp where empno=7900;
+dbms_output.put_line(s);
+
+end p1;
+------------------------
+exec p1.raise_sal(7900);
+---------------------------------
+create or replace package p1
+is
+ cursor c1 
+  is 
+  select empno from emp;
+ procedure p3;
+ procedure p4;
+end p1;
+--------------------------
+create or replace package body p1
+is
+ v_empno number;
+ procedure p3 is
+ begin
+  open c1;
+   loop
+     fetch c1 into v_empno;
+     dbms_output.put_line('id='||v_empno);
+     exit when c1%rowcount>=3;
+   end loop;
+end p3;
+procedure p4
+is begin
+ loop
+  fetch c1 into v_empno;
+  dbms_output.put_line('id:='||v_empno);
+  exit when c1%rowcount>=6;
+ end loop;
+ close c1;
+end p4;
+end p1;
+-----------------------
+exec p1.p3;
+exec p1.p4;
+--------------------
+
+
+
+
+
+

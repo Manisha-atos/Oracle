@@ -1,0 +1,85 @@
+  set serveroutput on;
+      DECLARE
+     TYPE employee_table_struct IS TABLE OF
+            emp.ename%TYPE
+            INDEX BY BINARY_INTEGER;
+         first_name_table employee_table_struct;
+    BEGIN
+    select ename,empno into first_name_table(1),first_name_table (20) from emp where empno=7566;
+dbms_output.put_line(first_name_table(1));
+END;
+
+--------------------------
+   set serveroutput on;
+         DECLARE
+     TYPE employee_table_struct IS TABLE OF
+            emp.ename%TYPE
+            INDEX BY BINARY_INTEGER;
+         first_name_table employee_table_struct;
+    BEGIN
+    select ename,empno into first_name_table(1),first_name_table (20) from emp where empno=7566;
+  dbms_output.put_line(first_name_table(1));
+  dbms_output.put_line(first_name_table(20));
+   END;
+-------------------------------------------------------------------------------
+ DECLARE
+      TYPE employee_table_struct IS TABLE OF
+           emp.ename%TYPE
+           INDEX BY BINARY_INTEGER;
+       employee_table    employee_table_struct;
+       CURSOR employee_cursor IS
+           SELECT ename
+             FROM emp
+            ORDER BY empno;
+       v_row      NUMBER := 1;
+   BEGIN
+       OPEN employee_cursor;
+       LOOP
+          EXIT WHEN employee_cursor%NOTFOUND;
+          fetch employee_cursor into employee_table(v_row); 
+           DBMS_OUTPUT.PUT_LINE(employee_table(v_row));
+                     v_row := v_row + 1;
+      END LOOP; 
+      CLOSE employee_cursor;
+   END;
+-----------------------------------------------
+  set serveroutput on;
+   DECLARE
+      TYPE employee_table_struct IS TABLE OF
+           emp%rowTYPE
+           INDEX BY BINARY_INTEGER; 
+      employee_table    employee_table_struct; 
+      CURSOR employee_cursor IS
+           SELECT * FROM emp ORDER BY empno; 
+      v_row      NUMBER := 1;
+   BEGIN
+       OPEN employee_cursor;
+       LOOP
+          EXIT WHEN employee_cursor%NOTFOUND;
+          fetch employee_cursor into employee_table(v_row); 
+           DBMS_OUTPUT.PUT(employee_table(v_row).empno);
+           DBMS_OUTPUT.PUT_LINE(employee_table(v_row).ename);
+                     v_row := v_row + 1;
+      END LOOP; 
+      CLOSE employee_cursor;
+   END;
+-----------------------------------------
+   set serveroutput on;
+   DECLARE
+    TYPE employee_rec_struct IS RECORD
+            (en      emp.ename%TYPE,
+             s      emp.sal%TYPE,
+   hdate          emp.hiredate%TYPE);
+  
+     TYPE employee_table_struct IS TABLE OF employee_rec_struct
+     INDEX BY BINARY_INTEGER;
+
+      employee_table   employee_table_struct;    
+    
+   BEGIN
+     select ename,sal,hiredate into employee_table(1).en,employee_table(1).s,employee_table(1).hdate
+     from emp where empno=7566;
+     dbms_output.put_line(employee_table(1).en);
+     dbms_output.put_line(employee_table(1).hdate);
+     END;
+
